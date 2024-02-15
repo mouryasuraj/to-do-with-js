@@ -7,7 +7,6 @@ const input = document.querySelector('#input')
 form.addEventListener('submit', (e) => {
     e.preventDefault()
     addTodo()
-
 })
 
 // Add todo function
@@ -38,31 +37,21 @@ function addTodo() {
 
     // addEventlistener on completedBtn
     completedBtn.addEventListener('click', () => {
-        if (inputField.style.textDecoration === 'line-through') {
-            inputField.style.textDecoration = 'none'
-            createTodo.style.backgroundColor = ''
-        } else {
-            inputField.style.textDecoration = 'line-through'
-            createTodo.style.backgroundColor = 'green'
-        }
+        toggleCompletedBtn(inputField, createTodo)
+        saveData()
+
     })
 
     // addEventlistener on editButton
     editBtn.addEventListener('click', () => {
-        if (inputField.hasAttribute('readonly')) {
-            inputField.removeAttribute('readonly')
-            editBtn.textContent = 'Save'
-            editBtn.style.backgroundColor = '#00ff00'
-        } else {
-            inputField.setAttribute('readonly', '')
-            editBtn.textContent = 'Edit'
-            editBtn.style.backgroundColor = ''
-        }
+        toggleEditBtn(inputField, editBtn)
+        saveData()
     })
 
     // addEventlistener on deleteButton
     deleteBtn.addEventListener('click', () => {
         toDoListContainer.removeChild(createTodo)
+        saveData()
     })
 
     createTodo.appendChild(inputField)
@@ -71,4 +60,73 @@ function addTodo() {
     createTodo.appendChild(deleteBtn)
     toDoListContainer.appendChild(createTodo)
     input.value = '';
+    saveData()
 }
+
+function toggleCompletedBtn(inputField, createTodo) {
+    if (inputField.style.textDecoration === 'line-through') {
+        inputField.style.textDecoration = 'none'
+        createTodo.style.backgroundColor = ''
+    } else {
+        inputField.style.textDecoration = 'line-through'
+        createTodo.style.backgroundColor = 'green'
+    }
+}
+
+function toggleEditBtn(inputField, editBtn) {
+    if (inputField.hasAttribute('readonly')) {
+        inputField.removeAttribute('readonly')
+        editBtn.textContent = 'Save'
+        editBtn.style.backgroundColor = '#00ff00'
+    } else {
+        inputField.setAttribute('value', `${inputField.value}`)
+        inputField.setAttribute('readonly', '')
+        editBtn.textContent = 'Edit'
+        editBtn.style.backgroundColor = ''
+    }
+}
+
+
+function saveData() {
+    localStorage.setItem('data', toDoListContainer.innerHTML);
+}
+
+function showTask() {
+    const getItem = localStorage.getItem('data')
+    if (getItem) {
+        toDoListContainer.innerHTML = getItem
+
+        const todoItems = document.querySelectorAll('.todo');
+        todoItems.forEach((todoItem) => {
+            const completedBtn = todoItem.querySelector('.completed')
+            const editBtn = todoItem.querySelector('.edit')
+            const deleteBtn = todoItem.querySelector('.delete')
+            const inputField = todoItem.querySelector('input')
+
+            completedBtn.addEventListener('click', () => {
+                toggleCompletedBtn(inputField, todoItem);
+                saveData()
+            })
+
+            editBtn.addEventListener('click', () => {
+                toggleEditBtn(inputField, editBtn)
+                saveData()
+            })
+
+            deleteBtn.addEventListener('click', () => {
+                toDoListContainer.removeChild(todoItem)
+                saveData()
+            })
+        })
+    }
+    saveData()
+}
+showTask();
+
+
+
+// localStorage.clear()
+
+
+
+
